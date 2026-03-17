@@ -1,4 +1,4 @@
-$FullName=Read-Host "Fullname: "
+$FullName=Read-Host "Fullname"
 $mb=Get-CimInstance Win32_BaseBoard
 $cpu=(Get-CimInstance Win32_Processor).Name
 $ram = [math]::Round((Get-CimInstance Win32_PhysicalMemory | Measure-Object Capacity -Sum).Sum / 1GB, 0)
