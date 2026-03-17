@@ -9,7 +9,7 @@ $disks=Get-PhysicalDisk|ForEach-Object{
 ($_.FriendlyName+' '+$_.MediaType+' '+[math]::Round($_.Size/1GB)+'GB')
 }
 
-Invoke-RestMethod -Uri "https://script.google.com/macros/s/AKfycbyXWSw2naSk5ksYobMlb7JOPaixMF24uN_239L4ZpsBX7Z87EsCyoctrLMlN_KoFe87rQ/exec" -Method POST -Body @{
+Invoke-RestMethod -Uri "https://script.google.com/a/macros/deped.gov.ph/s/AKfycbxIqOkQz6kjZdg6eFIoZSLN5Y9vHVxojEHebb2eOijuFFlUF3qb6aJzN5u2Sx8IXzzdRg/exec" -Method POST -Body @{
 fullname = $FullName
 pc=$env:COMPUTERNAME
 mbbrand=$mb.Manufacturer
