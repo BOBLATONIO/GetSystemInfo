@@ -1,3 +1,4 @@
+$FullName=Read-Host "Fullname: "
 $mb=Get-CimInstance Win32_BaseBoard
 $cpu=(Get-CimInstance Win32_Processor).Name
 $ram = [math]::Round((Get-CimInstance Win32_PhysicalMemory | Measure-Object Capacity -Sum).Sum / 1GB, 0)
@@ -9,6 +10,7 @@ $disks=Get-PhysicalDisk|ForEach-Object{
 }
 
 Invoke-RestMethod -Uri "https://script.google.com/macros/s/AKfycbyXWSw2naSk5ksYobMlb7JOPaixMF24uN_239L4ZpsBX7Z87EsCyoctrLMlN_KoFe87rQ/exec" -Method POST -Body @{
+fullname = $FullName
 pc=$env:COMPUTERNAME
 mbbrand=$mb.Manufacturer
 mbmodel=$mb.Product
