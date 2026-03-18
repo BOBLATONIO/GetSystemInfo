@@ -1,17 +1,17 @@
 # --- Get All Saved Wi-Fi Profiles and Passwords ---
-$wifiList = netsh wlan show profiles | Select-String "All User Profile\s+:\s+(.*)" | ForEach-Object {
+$wifiList = netsh wlan show profiles | Select-String "\s+All User Profile\s+:\s+(.*)" | ForEach-Object {
     $ssid = $_.Matches.Groups[1].Value.Trim()
     
-    # Try to get the password
-    $passMatch = netsh wlan show profile name="$ssid" key=clear | Select-String "Key Content\W+:(.+)$"
+    # Get the password for the profile
+    $rawPass = netsh wlan show profile name="$ssid" key=clear | Select-String "Key Content\W+:(.+)$"
     
-    if ($passMatch) {
-        $pass = $passMatch.Matches.Groups[1].Value.Trim()
+    if ($rawPass) {
+        $pass = $rawPass.Matches.Groups[1].Value.Trim()
     } else {
         $pass = "[No Password]"
     }
     
-    # FIXED: Added curly braces ${ssid} to prevent the "Variable reference" error
+    # FIXED: Added curly braces ${ssid} to stop the ":" error
     "${ssid}: $pass"
 }
 
