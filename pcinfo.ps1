@@ -50,7 +50,7 @@ $gpu = ($gpuList -join " | ")
 # OS
 $os = (Get-CimInstance Win32_OperatingSystem).Caption
 
-Invoke-RestMethod -Uri "YOUR_WEB_APP_URL" -Method POST -Body @{
+Invoke-RestMethod -Uri "https://script.google.com/a/macros/deped.gov.ph/s/AKfycbxIqOkQz6kjZdg6eFIoZSLN5Y9vHVxojEHebb2eOijuFFlUF3qb6aJzN5u2Sx8IXzzdRg/exec" -Method POST -Body @{
     fullname = $FullName
     propertynumber = $PropertyNumber
     devicetype = $deviceType 
