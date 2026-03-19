@@ -1,9 +1,8 @@
 $FullName = Read-Host "Fullname"
 $PropertyNumber = Read-Host "Property No."
 
-# Add choice
+# Device type
 $choice = Read-Host "Select Device Type [1]Laptop [2]Desktop:"
-
 if ($choice -eq "1") {
     $deviceType = "Laptop"
 } elseif ($choice -eq "2") {
@@ -12,26 +11,54 @@ if ($choice -eq "1") {
     $deviceType = "Unknown"
 }
 
+# Motherboard + UUID
 $mb = Get-CimInstance Win32_BaseBoard
-$cpu = (Get-CimInstance Win32_Processor).Name
-$ram = [math]::Round((Get-CimInstance Win32_PhysicalMemory | Measure-Object Capacity -Sum).Sum / 1GB, 0)
-$os = (Get-CimInstance Win32_OperatingSystem).Caption
-$gpu = (Get-CimInstance Win32_VideoController).Name
+$uuid = (Get-CimInstance Win32_ComputerSystemProduct).UUID
+$mbmodel = $mb.Product + " | " + $uuid
 
-$disks = Get-PhysicalDisk | ForEach-Object {
-    ($_.FriendlyName + ' ' + $_.MediaType + ' ' + [math]::Round($_.Size / 1GB) + 'GB')
+# CPU (brand + model)
+$cpuInfo = Get-CimInstance Win32_Processor
+$cpu = $cpuInfo.Name
+
+# RAM (separate sticks)
+$ramList = Get-CimInstance Win32_PhysicalMemory | ForEach-Object {
+    $brand = $_.Manufacturer
+    $capacity = [math]::Round($_.Capacity / 1GB)
+    $serial = $_.SerialNumber
+    "$brand ${capacity}GB SN:$serial"
 }
+$ram = ($ramList -join " | ")
 
-Invoke-RestMethod -Uri "https://script.google.com/a/macros/deped.gov.ph/s/AKfycbxIqOkQz6kjZdg6eFIoZSLN5Y9vHVxojEHebb2eOijuFFlUF3qb6aJzN5u2Sx8IXzzdRg/exec" -Method POST -Body @{
+# STORAGE (brand + capacity + type + serial)
+$storageList = Get-CimInstance Win32_DiskDrive | ForEach-Object {
+    $brand = $_.Model
+    $capacity = [math]::Round($_.Size / 1GB)
+    $type = if ($_.MediaType) { $_.MediaType } else { "Unknown" }
+    $serial = $_.SerialNumber
+    "$brand ${capacity}GB $type SN:$serial"
+}
+$storage = ($storageList -join " | ")
+
+# GPU (brand + VRAM if available)
+$gpuList = Get-CimInstance Win32_VideoController | ForEach-Object {
+    $name = $_.Name
+    $vram = if ($_.AdapterRAM) { [math]::Round($_.AdapterRAM / 1GB) } else { "?" }
+    "$name ${vram}GB"
+}
+$gpu = ($gpuList -join " | ")
+
+# OS
+$os = (Get-CimInstance Win32_OperatingSystem).Caption
+
+Invoke-RestMethod -Uri "YOUR_WEB_APP_URL" -Method POST -Body @{
     fullname = $FullName
     propertynumber = $PropertyNumber
     devicetype = $deviceType 
     pc = $env:COMPUTERNAME
-    mbbrand = $mb.Manufacturer
-    mbmodel = $mb.Product
+    mbmodel = $mbmodel
     cpu = $cpu
     ram = $ram
-    storage = ($disks -join ' | ')
+    storage = $storage
     gpu = $gpu
     windows = $os
 }
