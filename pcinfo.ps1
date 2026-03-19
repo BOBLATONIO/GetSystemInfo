@@ -21,6 +21,8 @@ $uuid = (Get-CimInstance Win32_ComputerSystemProduct).UUID
 $mbModel = $mb.Product
 $mbmodel = "$mbModel | $uuid"
 
+$bios = Get-CimInstance Win32_BIOS
+$deviceSerial = $bios.SerialNumber
 
 # =========================
 # CPU
@@ -83,7 +85,11 @@ Invoke-RestMethod -Uri "https://script.google.com/a/macros/deped.gov.ph/s/AKfycb
     propertynumber = $PropertyNumber
     devicetype = $deviceType 
     pc = $env:COMPUTERNAME
-    mbbrand = $mb.Manufacturer
+    mbbrand = if ($deviceSerial -and $deviceSerial.Trim() -ne "") {
+    "$($mb.Manufacturer) SN:$deviceSerial"
+} else {
+    $mb.Manufacturer
+}
     mbmodel = $mbmodel
     cpu = $cpu
     ram = $ram
