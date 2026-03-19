@@ -14,7 +14,7 @@ if ($choice -eq "1") {
 # =========================
 # MOTHERBOARD (FIX BRAND)
 # =========================
-$mbbrand = Get-CimInstance Win32_BaseBoard
+$mb = Get-CimInstance Win32_BaseBoard
 $cs = Get-CimInstance Win32_ComputerSystem
 $uuid = (Get-CimInstance Win32_ComputerSystemProduct).UUID
 
@@ -44,16 +44,16 @@ $ram = ($ramList -join " | ")
 # =========================
 # STORAGE (REAL TYPE FIX)
 # =========================
-$storageList = Get-CimInstance Win32_DiskDrive | ForEach-Object {
+$storageList = Get-PhysicalDisk | ForEach-Object {
 
     $brand = $_.Model
     $capacity = [math]::Round($_.Size / 1GB)
     $serial = $_.SerialNumber
-    $mediatype = $_.MediaType
+    $type = $_.MediaType
 
     
 
-    "$brand ${capacity}GB $mediatype SN:$serial"
+    "$brand ${capacity}GB $type SN:$serial"
 }
 $storage = ($storageList -join " | ")
 
@@ -83,7 +83,7 @@ Invoke-RestMethod -Uri "https://script.google.com/a/macros/deped.gov.ph/s/AKfycb
     propertynumber = $PropertyNumber
     devicetype = $deviceType 
     pc = $env:COMPUTERNAME
-    mbbrand = $mbbrand
+    mbbrand = $mb.Manufacturer
     mbmodel = $mbmodel
     cpu = $cpu
     ram = $ram
