@@ -14,19 +14,12 @@ if ($choice -eq "1") {
 # =========================
 # MOTHERBOARD (FIX BRAND)
 # =========================
-$mb = Get-CimInstance Win32_BaseBoard
+$mbbrand = Get-CimInstance Win32_BaseBoard
 $cs = Get-CimInstance Win32_ComputerSystem
 $uuid = (Get-CimInstance Win32_ComputerSystemProduct).UUID
 
-# fallback if manufacturer is empty
-$mbBrand = if ($mb.Manufacturer -and $mb.Manufacturer.Trim() -ne "") {
-    $mb.Manufacturer
-} else {
-    $cs.Manufacturer
-}
-
 $mbModel = $mb.Product
-$mbmodel = "$mbBrand $mbModel | $uuid"
+$mbmodel = "$mbModel | $uuid"
 
 
 # =========================
@@ -56,21 +49,11 @@ $storageList = Get-CimInstance Win32_DiskDrive | ForEach-Object {
     $brand = $_.Model
     $capacity = [math]::Round($_.Size / 1GB)
     $serial = $_.SerialNumber
+    $mediatype = $_.MediaType
 
-    # detect SSD / HDD / NVMe
-    $type = "Unknown"
+    
 
-    if ($_.Model -match "NVMe") {
-        $type = "NVMe SSD"
-    }
-    elseif ($_.Model -match "SSD") {
-        $type = "SATA SSD"
-    }
-    elseif ($_.MediaType -match "Fixed") {
-        $type = "HDD"
-    }
-
-    "$brand ${capacity}GB $type SN:$serial"
+    "$brand ${capacity}GB $mediatype SN:$serial"
 }
 $storage = ($storageList -join " | ")
 
@@ -100,6 +83,7 @@ Invoke-RestMethod -Uri "https://script.google.com/a/macros/deped.gov.ph/s/AKfycb
     propertynumber = $PropertyNumber
     devicetype = $deviceType 
     pc = $env:COMPUTERNAME
+    mbbrand = $mbbrand
     mbmodel = $mbmodel
     cpu = $cpu
     ram = $ram
